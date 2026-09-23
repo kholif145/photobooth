@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLASHBOX — Virtual Photo Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  font-family:"Space Grotesk",Arial,sans-serif;
+  background:#f1eee7;color:#161616;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;
+  background-image:radial-gradient(#111 1px,transparent 1px);background-size:7px 7px;
+}
+header{
+  height:72px;border-bottom:3px solid #111;display:flex;align-items:center;
+  padding:0 28px;background:#f1eee7;position:relative;z-index:3
+}
+.logo{font-family:"Bebas Neue",Impact,sans-serif;font-size:38px;letter-spacing:2px;line-height:1}
+.logo span{display:inline-block;background:#ff4d00;color:#fff;padding:0 8px;transform:skew(-8deg)}
+.badge{margin-left:16px;font-size:10px;font-weight:700;letter-spacing:2px;border:2px solid #111;padding:5px 8px}
+.header-right{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:1px}
+.layout{height:calc(100% - 72px);display:grid;grid-template-columns:280px 1fr;gap:0}
+.panel{border-right:3px solid #111;padding:25px 22px;background:#e7e3d9;display:flex;flex-direction:column}
+.eyebrow{font-size:10px;letter-spacing:2px;font-weight:700;margin-bottom:8px}
+h1{font-family:"Bebas Neue",Impact,sans-serif;font-size:42px;letter-spacing:1px;line-height:.9;margin:0 0 25px}
+.section{margin-bottom:22px}
+.section-title{font-size:10px;letter-spacing:2px;font-weight:700;margin-bottom:8px}
+button{
+  width:100%;border:2px solid #111;background:#f8f5ed;color:#111;
+  font:700 12px "Space Grotesk",Arial;padding:11px 12px;margin:0 0 8px;
+  text-align:left;cursor:pointer;box-shadow:3px 3px 0 #111;transition:.08s
+}
+button:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 #111}
+button.active{background:#111;color:#fff}
+button.orange{background:#ff4d00;color:#fff}
+button.orange:hover{background:#e84200}
+button.center{text-align:center}
+.info{margin-top:auto;border-top:2px solid #111;padding-top:13px;font-size:10px;line-height:1.5}
+.info b{font-size:11px}
+.workspace{padding:25px;display:flex;flex-direction:column;min-width:0}
+.topline{display:flex;align-items:flex-end;margin-bottom:14px}
+.topline .title{font-family:"Bebas Neue";font-size:30px;letter-spacing:1px}
+.topline .meta{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:1px}
+.stage-wrap{flex:1;min-height:0;position:relative;background:#111;padding:12px;box-shadow:7px 7px 0 #ff4d00}
+.stage{position:relative;width:100%;height:100%;background:#222;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #555}
+#video,#snapshot{width:100%;height:100%;object-fit:contain;display:block;transform:scaleX(-1)}
+#snapshot{display:none}
+.placeholder{color:#eee;text-align:center;font-size:14px;line-height:1.5}
+.placeholder strong{font-family:"Bebas Neue";font-size:30px;letter-spacing:1px}
+#frameOverlay{position:absolute;inset:0;pointer-events:none;display:none}
+#frameOverlay.neon{box-shadow:inset 0 0 0 8px #ff4d00,inset 0 0 0 14px #f1eee7}
+#frameOverlay.editorial{box-shadow:inset 0 0 0 8px #f1eee7}
+#frameOverlay.editorial:after{
+ content:"FLASHBOX / 26";position:absolute;bottom:16px;right:20px;
+ color:#fff;font:24px "Bebas Neue";letter-spacing:2px;text-shadow:2px 2px #111
+}
+.countdown{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+color:#fff;background:#111a;font:150px "Bebas Neue";text-shadow:6px 6px #ff4d00;z-index:5}
+.status{position:absolute;left:15px;bottom:15px;background:#f1eee7;color:#111;padding:7px 10px;
+font-size:10px;font-weight:700;letter-spacing:.7px;z-index:6}
+.strip{position:absolute;right:15px;top:15px;background:#f1eee7;padding:8px;display:none;
+gap:6px;flex-direction:column;z-index:8;box-shadow:5px 5px #ff4d00}
+.strip img{width:105px;height:70px;object-fit:cover}
+.footer{margin-top:15px;display:flex;font-size:9px;font-weight:700;letter-spacing:1px}
+.footer span:last-child{margin-left:auto}
+.toast{position:fixed;right:25px;bottom:25px;background:#111;color:#fff;border-left:5px solid #ff4d00;
+padding:12px 15px;font-size:11px;font-weight:700;display:none;z-index:20}
+@media(max-width:750px){
+ header{padding:0 15px}.badge,.header-right{display:none}
+ .layout{grid-template-columns:170px 1fr}.panel{padding:15px 12px}
+ h1{font-size:31px}.workspace{padding:15px}.stage-wrap{padding:7px;box-shadow:4px 4px #ff4d00}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">FLASH<span>BOX</span></div>
+  <div class="badge">VIRTUAL PHOTO STUDIO</div>
+  <div class="header-right">DIGITAL BOOTH / ONLINE EDITION 01</div>
+</header>
+
+<div class="layout">
+<aside class="panel">
+  <div class="eyebrow">WELCOME TO</div>
+  <h1>YOUR<br>PHOTO<br>SESSION</h1>
+
+  <div class="section">
+    <div class="section-title">01 / FRAME STYLE</div>
+    <button class="frameBtn active" data-frame="neon">▰ ORANGE CUT</button>
+    <button class="frameBtn" data-frame="editorial">□ EDITORIAL</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">02 / CAMERA</div>
+    <button id="openCam">● START CAMERA</button>
+    <button id="switchCam">↻ SWITCH CAMERA</button>
+  </div>
+
+  <button id="capture" class="orange center">TAKE THE SHOT →</button>
+  <button id="retake">↩ RETAKE</button>
+  <button id="save">↓ SAVE IMAGE</button>
+  <button id="downloadStrip">＋ ADD TO STRIP</button>
+
+  <div class="info">
+    <b>HOW IT WORKS</b><br>
+    Start the camera, choose your frame, then hit TAKE THE SHOT. A 3-second countdown will begin automatically.
+  </div>
+</aside>
+
+<main class="workspace">
+  <div class="topline"><div class="title">LIVE VIEWFINDER</div><div class="meta">NO FILTERS / JUST FLASH</div></div>
+  <div class="stage-wrap">
+    <div class="stage">
+      <div class="placeholder" id="placeholder"><strong>CAMERA OFFLINE</strong><br>Press START CAMERA to enter the booth.</div>
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas" hidden></canvas>
+      <img id="snapshot" alt="Captured photo">
+      <div id="frameOverlay" class="neon"></div>
+      <div class="countdown" id="countdown"></div>
+      <div class="strip" id="strip"></div>
+      <div class="status" id="status">READY / CAMERA OFFLINE</div>
+    </div>
+  </div>
+  <div class="footer"><span>FLASHBOX © 2026</span><span>MAKE A MOMENT. KEEP THE FRAME.</span></div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const video=document.getElementById('video'),canvas=document.getElementById('canvas'),
+snapshot=document.getElementById('snapshot'),overlay=document.getElementById('frameOverlay'),
+countdown=document.getElementById('countdown'),placeholder=document.getElementById('placeholder'),
+status=document.getElementById('status'),strip=document.getElementById('strip');
+let stream=null,devices=[],currentDevice=0,selectedFrame='neon',lastBlob=null,photos=[];
+
+function msg(t){status.textContent=t}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2200)}
+function stop(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+async function cams(){try{devices=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput')}catch(e){devices=[]}}
+async function startCam(){
+ if(!navigator.mediaDevices?.getUserMedia){msg('BROWSER DOES NOT SUPPORT CAMERA');return}
+ try{
+  stop();await cams();const id=devices[currentDevice]?.deviceId;
+  stream=await navigator.mediaDevices.getUserMedia({video:id?{deviceId:{exact:id},width:{ideal:1280},height:{ideal:720}}:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false});
+  video.srcObject=stream;video.style.display='block';snapshot.style.display='none';placeholder.style.display='none';
+  overlay.style.display='block';msg('READY / CAMERA ONLINE');
+ }catch(e){msg('CAMERA BLOCKED / CHECK BROWSER PERMISSION');toast('Camera permission required')}
+}
+document.getElementById('openCam').onclick=startCam;
+document.getElementById('switchCam').onclick=async()=>{await cams();if(devices.length>1){currentDevice=(currentDevice+1)%devices.length;startCam()}else toast('No second camera found')};
+
+document.querySelectorAll('.frameBtn').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.frameBtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ selectedFrame=b.dataset.frame;overlay.className=selectedFrame;toast('FRAME / '+b.textContent.trim());
+});
+
+async function shot(){
+ if(!stream){await startCam();if(!stream)return}
+ countdown.style.display='flex';
+ for(let n=3;n>0;n--){countdown.textContent=n;await new Promise(r=>setTimeout(r,700))}
+ countdown.textContent='FLASH';await new Promise(r=>setTimeout(r,300));countdown.style.display='none';
+ const w=video.videoWidth,h=video.videoHeight;canvas.width=w;canvas.height=h;
+ const c=canvas.getContext('2d');c.save();c.translate(w,0);c.scale(-1,1);c.drawImage(video,0,0,w,h);c.restore();
+ if(selectedFrame==='neon'){
+  c.strokeStyle='#ff4d00';c.lineWidth=Math.max(16,w*.014);c.strokeRect(8,8,w-16,h-16);
+  c.strokeStyle='#f1eee7';c.lineWidth=4;c.strokeRect(23,23,w-46,h-46);
+ }else{
+  c.strokeStyle='#f1eee7';c.lineWidth=Math.max(16,w*.014);c.strokeRect(8,8,w-16,h-16);
+  c.font=`bold ${Math.max(25,w*.02)}px Arial`;c.textAlign='right';c.fillStyle='#fff';c.strokeStyle='#111';c.lineWidth=4;
+  c.strokeText('FLASHBOX / 26',w-30,h-30);c.fillText('FLASHBOX / 26',w-30,h-30);
+ }
+ lastBlob=canvas.toDataURL('image/png');snapshot.src=lastBlob;snapshot.style.display='block';video.style.display='none';
+ msg('CAPTURE COMPLETE / READY TO SAVE');
+}
+document.getElementById('capture').onclick=shot;
+document.getElementById('retake').onclick=()=>{snapshot.style.display='none';video.style.display=stream?'block':'none';msg(stream?'READY / CAMERA ONLINE':'READY / CAMERA OFFLINE')};
+document.getElementById('save').onclick=()=>{
+ if(!lastBlob){toast('TAKE A SHOT FIRST');return}
+ const a=document.createElement('a');a.href=lastBlob;a.download='flashbox-'+Date.now()+'.png';a.click();toast('IMAGE SAVED');
+};
+document.getElementById('downloadStrip').onclick=()=>{
+ if(!lastBlob){toast('TAKE A SHOT FIRST');return}
+ photos.push(lastBlob);if(photos.length>4)photos.shift();strip.innerHTML='';
+ photos.forEach(p=>{const im=document.createElement('img');im.src=p;strip.appendChild(im)});
+ strip.style.display='flex';toast('ADDED TO PHOTO STRIP');
+};
+</script>
+</body>
+</html>
